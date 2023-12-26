@@ -1,36 +1,61 @@
+
+document.getElementById("util").addEventListener('change', (e) => {
+  const textInput = document.getElementById("usefulLife");
+  const select = document.getElementById("selecionarBem");
+
+  if (e.target.checked) {
+    textInput.disabled = true;
+    select.style.display = "block";
+    carregarCategorias();
+  } else {
+    textInput.disabled = false;
+    select.style.display = "none";
+  }
+});
+
+function carregarCategorias() {
+  const select = document.getElementById("selecionarBem");
+  select.innerHTML = ""; // Limpa as opções existentes
+
+  taxaDepreciacao.forEach(function (categoria) {
+    const opc = document.createElement('option');
+    opc.value = categoria.taxa;
+    opc.text = categoria.Descricao;
+    select.add(opc);
+  });
+}
+
 function calculateDepreciation() {
-    var valorEquipamento = parseFloat(
-        document.getElementById("equipmentValue").value
-    );
-    var valorSucata = parseFloat(
-        document.getElementById("scrapValue").value
-    );
-    var vidaUtil = parseFloat(
-        document.getElementById("usefulLife").value
-    );
-    var tempoDeUso = parseFloat(document.getElementById("timeOfUse").value);
+  const valorEquipamento = parseFloat(document.getElementById("equipmentValue").value);
+  const valorSucata = parseFloat(document.getElementById("scrapValue").value);
+  const vidaUtil = parseFloat(document.getElementById("usefulLife").value);
+  const tempoDeUso = parseFloat(document.getElementById("timeOfUse").value);
 
-    if (
-        isNaN(valorEquipamento) ||
-        isNaN(valorSucata) ||
-        isNaN(vidaUtil) ||
-        isNaN(tempoDeUso)
-    ) {
-        alert("Por favor adicione números válidos.");
-        return;
-    }
+  if (isNaN(valorEquipamento) || isNaN(valorSucata) || isNaN(tempoDeUso)) {
+    alert("Por favor adicione números válidos.");
+    return;
+  }
 
-    var vidaTotal = vidaUtil * 12;
-    var taxaDepreciacaoAnual = (valorEquipamento - valorSucata) / vidaTotal;
-    var depreciacaoTotal = taxaDepreciacaoAnual * tempoDeUso;
-    var depreciacaoMensal = taxaDepreciacaoAnual / tempoDeUso;
-    var valorContabilFinal = valorEquipamento - valorSucata;
-    var resultadoAnual = "Depreciação Total Anual: R$" + depreciacaoTotal.toFixed(2);
-    var resultadoMensal = "Depreciação mensal: R$" + depreciacaoMensal.toFixed(2);
-    var resultadoContabilfinal = "Valor Contábil Final: R$" + valorContabilFinal.toFixed(2);
+  const vidaTotal = vidaUtil;
+  let taxaDepreciacao = 0;
 
-    document.getElementById("result").innerHTML = resultadoAnual;
-    document.getElementById("result-mensal").innerHTML = resultadoMensal;
-    document.getElementById("result-contabil").innerHTML = resultadoContabilfinal;
-    
+  if (document.getElementById("util").checked) {
+    const selectValue = parseFloat(document.getElementById("selecionarBem").value);
+    taxaDepreciacao = (valorEquipamento - valorSucata) * selectValue;
+  } else {
+    taxaDepreciacao = (valorEquipamento - valorSucata) / vidaTotal;
+  }
+
+  const depreciacaoTotal = taxaDepreciacao * tempoDeUso;
+  const valorContabilFinal = valorEquipamento - depreciacaoTotal;
+
+  function createResultHTML(label, value) {
+    return "<div><span>" + label + ":</span> <span>R$" + value.toFixed(2) + "</span></div>";
+  }
+
+  const resultadoDepAnual = createResultHTML("A depreciação total da máquina ou equipamento é de R$", depreciacaoTotal);
+  const resultadoContabilFinal = createResultHTML("Valor Contábil Final", valorContabilFinal);
+
+  document.getElementById("result").innerHTML = resultadoDepAnual;
+  document.getElementById("result-contabil").innerHTML = resultadoContabilFinal;
 }
